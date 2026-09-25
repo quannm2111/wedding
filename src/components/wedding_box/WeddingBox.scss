@@ -1,0 +1,67 @@
+@import "../../app.scss";
+
+.wedding-box-container {
+  display: flex;
+  color: var(--ink);
+  width: 100%;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 3.5rem 1rem 3rem;
+}
+
+.wedding-box {
+  width: min(460px, 100%);
+  padding: 2.4rem 1.8rem;
+}
+
+.wedding-box .title-wrapper {
+  font-size: clamp(2.6rem, 7vw, 3.6rem);
+  margin-bottom: 0.8rem;
+
+  span {
+    font-family: "Great Vibes", cursive;
+    color: var(--burgundy);
+  }
+}
+
+.des {
+  color: var(--ink-soft);
+  margin-bottom: 1.4rem;
+}
+
+.qr-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 1.2rem;
+  background: var(--cream);
+  border-radius: 16px;
+}
+
+.qr-image {
+  width: 180px;
+  height: 180px;
+  background: #fff;
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.bank-des {
+  font-size: 0.95rem;
+}
+
+.copy-btn {
+  margin-top: 0.7rem;
+  border: 0;
+  background: var(--burgundy);
+  color: #fff8f2;
+  padding: 0.65rem 1.1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

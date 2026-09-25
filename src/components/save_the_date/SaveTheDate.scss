@@ -1,0 +1,115 @@
+@import "../../app.scss";
+
+.save-the-date {
+  display: flex;
+  min-height: 100vh;
+  align-items: stretch;
+}
+
+.save-the-date-photo {
+  flex: 1.15;
+  width: 100%;
+  object-fit: cover;
+  max-height: 100vh;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.save-the-date-wrapper {
+  flex: 0.85;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 2.2rem 1.5rem;
+  padding: 2rem 1.5rem 2.5rem;
+  background: var(--paper);
+
+  @include mobile {
+    flex: 1;
+    margin: 2.2rem 1rem 2rem;
+  }
+}
+
+.avatar {
+  width: min(280px, 70%);
+  margin-bottom: -24px;
+}
+
+.for-the-wedding p {
+  text-align: center;
+  font-weight: 400;
+  font-size: 1.5rem;
+  color: var(--ink-soft);
+}
+
+.invitation {
+  color: var(--ink);
+
+  .invitation-label {
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+  }
+
+  .decoded-name {
+    margin-top: 0.6rem;
+    text-align: center;
+    font-family: "Great Vibes", cursive;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    color: var(--burgundy);
+    max-width: 420px;
+  }
+}
+
+.calender-place-holder {
+  width: 100%;
+  padding: 1rem 2.5rem 0;
+  color: var(--ink);
+
+  @include mobile {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  h3 {
+    font-weight: 700;
+    font-size: 1.15rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .calender {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.45rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    text-align: center;
+    font-size: 0.92rem;
+
+    .heart-container {
+      position: relative;
+      width: 28px;
+      height: 28px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--burgundy);
+      color: #fff;
+      border-radius: 50%;
+      font-weight: 700;
+    }
+
+    .text {
+      z-index: 1;
+    }
+  }
+}

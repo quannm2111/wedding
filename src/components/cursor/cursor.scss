@@ -1,0 +1,19 @@
+@import "../../app.scss";
+
+.cursor {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 248, 242, 0.85);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  will-change: transform;
+
+  @include mobile {
+    display: none;
+  }
+}

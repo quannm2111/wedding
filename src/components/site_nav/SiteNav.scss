@@ -1,0 +1,91 @@
+@import "../../app.scss";
+
+.site-nav {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  width: min(920px, calc(100% - 1.5rem));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 1rem;
+  background: rgba(247, 241, 230, 0.82);
+  border: 1px solid rgba(196, 165, 116, 0.35);
+  border-radius: 999px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px rgba(44, 24, 16, 0.08);
+}
+
+.site-nav-brand {
+  font-family: "Great Vibes", cursive;
+  font-size: 1.7rem;
+  color: var(--burgundy);
+  padding: 0 0.4rem;
+}
+
+.site-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+
+  a {
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.45rem 0.7rem;
+    border-radius: 999px;
+    color: var(--ink-soft);
+    transition: background 0.2s ease, color 0.2s ease;
+
+    &:hover {
+      background: var(--cream-deep);
+      color: var(--ink);
+    }
+  }
+
+  @include tablet {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    padding: 0.8rem;
+    background: var(--paper);
+    border-radius: 18px;
+    border: 1px solid rgba(196, 165, 116, 0.35);
+    box-shadow: var(--shadow);
+
+    &.is-open {
+      display: flex;
+    }
+  }
+}
+
+.site-nav-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+
+  span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--ink);
+    border-radius: 99px;
+  }
+
+  @include tablet {
+    display: flex;
+  }
+}
