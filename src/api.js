@@ -1,4 +1,4 @@
-import { addDoc, collection, documentId, getDocs, limit, orderBy, query, serverTimestamp, startAfter } from 'firebase/firestore';
+import { addDoc, collection, documentId, getDocs, limit, orderBy, query, serverTimestamp, startAfter, Timestamp } from 'firebase/firestore';
 import { db } from './firebase/firebaseConfig';
 import { AVATAR_COLORS, validateWish } from './guestbook';
 const guestBook = () => {
@@ -13,5 +13,8 @@ export async function getGuestCommentFireBase(cursor = null) {
 }
 export async function addGuestCommentFireBase(input) {
   const payload = validateWish(input.guest_name, input.message);
-  return addDoc(guestBook(), { ...payload, create_date: serverTimestamp(), avatar_color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)] });
+  const avatar_color = AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)];
+  const reference = await addDoc(guestBook(), { ...payload, create_date: serverTimestamp(), avatar_color });
+  // Display the acknowledged write immediately; the server timestamp is read on reopening.
+  return { ...payload, id: reference.id, avatar_color, create_date: Timestamp.now() };
 }

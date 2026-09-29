@@ -1,3 +1,5 @@
+import { weddingAlbum } from './generated/weddingAlbum.js';
+
 export const wedding = {
   date: '2026-10-25',
   startsAt: '2026-10-25T11:00:00+07:00',
@@ -13,7 +15,7 @@ export const wedding = {
   images: { desktop: '/wedding/web/ZEN_1975.webp', mobile: '/wedding/web/ZEN_1975.webp', thanks: '/wedding/web/ZEN_2088.webp' },
   invitation: 'Trân trọng kính mời quý gia đình, người thân và bạn bè đến chung vui trong lễ thành hôn của chúng mình. Sự hiện diện và những lời chúc yêu thương của quý vị là niềm hạnh phúc lớn lao đối với hai gia đình.',
   thanks: 'Cảm ơn bạn đã dành tình cảm và những lời chúc tốt đẹp cho chúng mình. Hẹn gặp bạn trong ngày vui, để cùng lưu giữ những khoảnh khắc thật đáng nhớ.',
-  album: ['ZEN_1975', 'ZEN_2088', 'ZEN_2310', 'ZEN_2331', 'ZEN_2353', 'ZEN_2614', 'ZEN_2508', 'ZEN_2748', 'ZEN_1777', 'ZEN_2917'].map(name => `/wedding/web/${name}.webp`),
+  album: weddingAlbum,
   timeline: [
     {
       title: 'Tình cờ gặp nhau',

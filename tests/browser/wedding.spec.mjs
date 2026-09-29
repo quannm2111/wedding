@@ -59,10 +59,10 @@ test('reveal waits for viewport and reduced motion reveals all without autoplay'
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect(page.locator('#TimelineSection .story-item').first()).toHaveCSS('opacity', '1');
   await expect(page.locator('#TimelineSection .story-item').first()).toHaveCSS('transform', 'none');
-  await page.locator('.photo-gallery').scrollIntoViewIfNeeded();
-  await expect(page.locator('.gallery-thumbnails button').first()).toHaveAttribute('aria-current', 'true');
+  await page.locator('.album-collection').scrollIntoViewIfNeeded();
+  await expect(page.locator('.album-grid-photo')).toHaveCount(8);
   await page.waitForTimeout(1500);
-  await expect(page.locator('.gallery-thumbnails button').first()).toHaveAttribute('aria-current', 'true');
+  await expect(page.locator('.album-grid-photo')).toHaveCount(8);
   await expect(page.locator('.hero-hearts')).toHaveCSS('display', 'none');
 });
 
@@ -107,27 +107,66 @@ test('seal moves in sync with the left door without moving down', async ({ page 
   await expect(page.locator('.envelope-screen')).toHaveCount(0);
   await expect(seal).toHaveCount(0);
 });
-for (const width of [360, 390, 768, 1440]) {
- test(`gallery selection, full photos and zoom at ${width}`, async ({ page }) => {
+for (const width of [360, 390, 768, 1024, 1440, 1920]) {
+ test(`album shows eight then loads remaining photos at ${width}`, async ({ page }) => {
   await page.setViewportSize({ width, height: 900 });
   await page.goto('/');
   await expect(page.locator('.envelope-screen')).toHaveCount(0, { timeout: 6000 });
-  await page.locator('.photo-gallery').scrollIntoViewIfNeeded();
-  await page.mouse.move(0, 0);
-  const thumbs = page.locator('.gallery-thumbnails button');
-  await expect(page.locator('.gallery-current')).toHaveCSS('object-fit', 'contain');
-  await expect(thumbs.nth(1)).toHaveAttribute('aria-current', 'true', { timeout: 8000 });
-  await thumbs.nth(4).click();
-  await expect(thumbs.nth(4)).toHaveAttribute('aria-current', 'true');
-  await expect(page.locator('.gallery-current')).toHaveClass(/is-ready/);
-  await page.locator('.gallery-main').click();
+  await page.locator('.album-collection').scrollIntoViewIfNeeded();
+  const photos = page.locator('.album-grid-photo');
+  await expect(photos).toHaveCount(8);
+  await expect(page.locator('.album-batch').first().locator('.album-column')).toHaveCount(width >= 1024 ? 4 : width >= 768 ? 3 : 2);
+  if (width >= 1024) {
+    const box = await page.locator('.album-batch').first().boundingBox();
+    expect(box.height).toBeLessThan(900);
+  }
+
+  await expect(page.getByRole('button', { name: 'Phóng to ảnh 9', exact: true })).toHaveCount(0);
+  await expect(photos.first().locator('img')).toHaveCSS('object-fit', 'contain');
+  const gap = await page.locator('.album-columns').first().evaluate(node => parseFloat(getComputedStyle(node).columnGap));
+  expect(gap).toBeLessThanOrEqual(8);
+  await expect(photos.first()).toHaveCSS('padding', '0px');
+  await photos.first().click();
   await expect(page.locator('.fancybox__container')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.locator('.fancybox__container')).toHaveCount(0);
-  await page.locator('.gallery-main').focus();
-  await page.keyboard.press('ArrowRight');
-  await expect(thumbs.nth(5)).toHaveAttribute('aria-current', 'true');
+  await expect(photos).toHaveCount(8);
+  await page.getByRole('button', { name: 'Xem thêm', exact: false }).click();
+  await expect(photos).toHaveCount(16);
+  await expect(photos.nth(8)).toBeFocused();
+  await expect(page.getByRole('button', { name: 'Xem thêm', exact: false })).toBeVisible();
+  await photos.nth(9).click();
+  await expect(page.locator('.fancybox__container')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.fancybox__container')).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.locator('.photo-gallery').screenshot({ path: `test-results/gallery-${width}.png` });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const overlaps = await photos.evaluateAll(nodes => {
+    const rects = nodes.map(node => node.getBoundingClientRect());
+    return rects.some((a,i) => rects.some((b,j) => i !== j && a.left < b.right-1 && a.right > b.left+1 && a.top < b.bottom-1 && a.bottom > b.top+1));
+  });
+  expect(overlaps).toBe(false);
+  for (const columns of await page.locator('.album-columns').all()) {
+    for (const img of await columns.locator('img').all()) {
+      await img.scrollIntoViewIfNeeded();
+      await expect(img).toHaveJSProperty('complete', true);
+    }
+    const bottoms = await columns.locator('.album-column').evaluateAll(nodes => nodes.map(node => node.getBoundingClientRect().bottom));
+    expect(Math.max(...bottoms) - Math.min(...bottoms)).toBeLessThan(1);
+  }
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.locator('.album-collection').screenshot({ path: `test-results/album-grid-${width}.png` });
+  for (const count of [24, 32, 36]) {
+    await page.getByRole('button', { name: 'Xem thêm', exact: false }).click();
+    await expect(photos).toHaveCount(count);
+  }
+  await expect(page.getByRole('button', { name: 'Xem thêm', exact: false })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Thu gọn', exact: true }).click();
+  await expect(photos).toHaveCount(8);
+  await expect(photos.first()).toBeFocused();
+  await expect(photos.first()).toBeInViewport();
+  await expect(page.getByRole('button', { name: 'Thu gọn', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Xem thêm', exact: false }).click();
+  await expect(photos).toHaveCount(16);
  });
 }

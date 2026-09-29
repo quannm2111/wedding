@@ -1,4 +1,4 @@
-# Thiệp cưới Quân & Hường
+﻿# Thiệp cưới Quân & Hường
 
 React 18 + Vite. Ngày cưới: **11:00, 25/10/2026 (Asia/Ho_Chi_Minh)**.
 
@@ -15,7 +15,9 @@ npm run preview
 
 Tất cả thông tin hiển thị nằm trong `src/wedding.js`: gia đình, địa điểm, ngày giờ, lời mời, lời cảm ơn, ảnh và timeline. Khi đổi ngày, cập nhật cả `date` và `startsAt`; giữ múi giờ `+07:00`. Giao diện tự tính lịch và đếm ngược.
 
-Ảnh được lấy từ các thư mục con trong `public/wedding`. Chạy `npm run prepare-wedding-images` để tạo bản WebP rộng tối đa 1600px trong `public/wedding/web`, giữ nguyên ảnh gốc. Banner dùng `ZEN_1975`, chú rể dùng `ZEN_2171`, cô dâu dùng `ZEN_2280`, phần cảm ơn dùng `ZEN_2088`; album gồm 10 ảnh đôi. Thay lựa chọn và thứ tự trong `images`, `groom.image`, `bride.image`, `album` của `src/wedding.js`. Nếu đổi ảnh banner, cập nhật cả preload trong `index.html`. Ba mốc đầu timeline vẫn là nội dung mẫu chưa có ngày.
+Ảnh album lấy từ các file JPG đặt trực tiếp trong `public/wedding` (hiện có 36 ảnh). Sau khi thêm hoặc thay ảnh, chạy `npm run prepare-wedding-images`: lệnh tạo WebP rộng tối đa 1600px trong `public/wedding/web` và cập nhật danh sách, tỷ lệ ảnh tại `src/generated/weddingAlbum.js`, sắp xếp theo tên file. Giữ nguyên ảnh gốc; không lấy lại các bản in trong thư mục con. `npm run optimize-images` là lệnh tương đương. Album hiển thị 8 ảnh đầu, mỗi lần “Xem thêm” hiện tối đa 8 ảnh tiếp theo.
+
+Banner dùng `ZEN_1975`, chú rể dùng `ZEN_2171`, cô dâu dùng `ZEN_2280`, phần cảm ơn dùng `ZEN_2088`; thay các lựa chọn này tại `src/wedding.js`. Nếu đổi ảnh banner, cập nhật cả preload trong `index.html`. Trước khi xóa ảnh gốc, kiểm tra ảnh đó có được dùng cho banner, giới thiệu hoặc timeline không. Ba mốc đầu timeline vẫn là nội dung mẫu chưa có ngày.
 
 ## Firebase mới
 
@@ -47,7 +49,7 @@ Các kiểm tra bao gồm lịch, múi giờ trước/sau sự kiện, validatio
 
 ## Album ghép ảnh và phong bao
 
-Album dùng một ảnh lớn hiển thị đầy đủ và dải ảnh thu nhỏ cuộn ngang. Danh sách ảnh nằm trong `wedding.album` tại `src/wedding.js`. Ảnh tự chuyển sau 4,5 giây bằng hiệu ứng mờ dần 1,2 giây; tạm dừng khi hover, focus, chuyển tab hoặc ra khỏi màn hình. Chọn ảnh, vuốt, dùng phím trái/phải hoặc mở zoom sẽ dừng tự chuyển. Bấm ảnh chính để xem lớn. Chế độ giảm chuyển động tắt tự chuyển và hiệu ứng.
+Trên điện thoại, album ban đầu hiển thị tối đa 8 ảnh: ảnh đầu toàn chiều rộng, các ảnh tiếp theo xếp sát trong hai cột rộng–hẹp. Ảnh giữ tỷ lệ gốc, không có khung đệm hay chiều cao ô cố định; khe ảnh 6px trên mobile và 8px trên desktop. Nút “Xem thêm” bổ sung tối đa 8 ảnh tiếp theo, hết ảnh thì ẩn nút. Nhóm cuối dưới 8 ảnh dùng hai cột gọn. Danh sách nằm trong `wedding.album` tại `src/wedding.js`. Bấm ảnh để phóng to; trình xem chỉ chứa các ảnh đã mở.
 
 Màn chào gồm hai cánh cửa hồng pastel phủ toàn màn hình, tự bắt đầu mở sau 0,9 giây và trượt sang hai bên trong khoảng 2,1 giây. Có thể chạm chữ Hỉ để mở sớm. Nút “Đóng thiệp” cho phép xem lại hiệu ứng mà vẫn giữ nội dung form lời chúc. Hiệu ứng reveal kéo dài 1,3 giây; chế độ giảm chuyển động bỏ qua các chuyển động trang trí.
 
@@ -65,3 +67,10 @@ Popup lời chúc có chiều cao cố định theo viewport, phần nội dung 
 Rules trong workspace không tự đồng bộ lên Firebase. Kiểm thử emulator xác nhận mã và Rules cục bộ; không xác nhận Rules đang chạy trên dự án thật.
 
 Lỗi đã phát hiện: bảng màu avatar pastel trong `src/guestbook.js` không khớp danh sách màu được phép trong Rules cũ. Rules hiện đã cho phép bảng màu mới và giữ tương thích màu cũ. Cần Publish lại `firestore.rules` đã cập nhật. Truy vấn chỉ đọc trên dự án thật cũng trả `PERMISSION_DENIED`; chưa có tài khoản CLI để kiểm tra Rules thực tế đang triển khai.
+
+Album responsive: từ 1024px dùng 4 cột (1–2–2–3 ảnh), 768–1023px dùng 3 cột; mobile giữ bố cục ảnh lớn phía trên và 2 cột phía dưới. Độ rộng cột được tính theo tỷ lệ ảnh và khe để mọi cột có cùng chiều cao, không cắt ảnh. Chiều rộng tối đa trên desktop là 1200px.
+
+
+## Gửi lời chúc trên điện thoại
+
+Khách nhập emoji trực tiếp bằng bàn phím; popup không còn bộ chọn nhãn dán. Các emoji đã gửi trước đây vẫn hiển thị trong nội dung lời chúc. Sau khi Firebase xác nhận lưu thành công, giao diện thêm lời chúc vào danh sách và xóa form ngay, không chờ tải lại 50 lời chúc. Thời gian hiển thị ngay sau gửi dùng giờ trên thiết bị; khi mở lại popup sẽ đọc thời gian máy chủ đã lưu. Khi gửi lỗi, giữ nguyên tên và nội dung để thử lại.

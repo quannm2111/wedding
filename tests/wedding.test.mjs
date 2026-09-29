@@ -3,6 +3,12 @@ import assert from 'node:assert/strict';
 import { calendarDays, getCountdown, dateLabel, timeLabel } from '../src/wedding.js';
 import { validateWish } from '../src/guestbook.js';
 
+test('emoji wishes preserve Unicode and enforce character limits', () => {
+  const emoji = '\u{1f496}';
+  assert.equal(validateWish('Mai', emoji.repeat(1000)).message, emoji.repeat(1000));
+  assert.throws(() => validateWish('Mai', emoji.repeat(1001)));
+});
+
 test('October calendar starts on Thursday and wedding is Sunday', () => {
   const { cells } = calendarDays();
   assert.equal(cells.indexOf(1), 3);

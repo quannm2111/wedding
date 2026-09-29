@@ -1,14 +1,19 @@
 import { guestBookError } from '../../firebase/guestBookError';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { addGuestCommentFireBase, getGuestCommentFireBase } from '../../api';
 import { isFirebaseConfigured } from '../../firebase/firebaseConfig';
 import { AVATAR_COLORS, validateWish, WISH_SUGGESTIONS } from '../../guestbook';
 import { wedding } from '../../wedding';
 
+const dateFormatter = new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short', timeStyle: 'short', timeZone: wedding.timeZone });
 const formatDate = value => {
   const date = value?.toDate?.();
-  return date ? new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short', timeStyle: 'short', timeZone: wedding.timeZone }).format(date) : 'Vừa gửi';
+  return date ? dateFormatter.format(date) : 'Vừa gửi';
 };
+
+const WishItem = memo(function WishItem({ item }) {
+  return <article className="wish-item"><span className="avatar" aria-hidden="true" style={{ backgroundColor: AVATAR_COLORS.includes(item.avatar_color) ? item.avatar_color : AVATAR_COLORS[0] }}>{Array.from(item.guest_name.trim())[0]?.toLocaleUpperCase('vi-VN')}</span><div><h3>{item.guest_name}</h3><time dateTime={item.create_date?.toDate?.().toISOString()}>{formatDate(item.create_date)}</time><p>{item.message}</p></div></article>;
+});
 
 export default function GuestBook() {
   const dialog = useRef(null);
@@ -73,9 +78,12 @@ export default function GuestBook() {
     if (!navigator.onLine) { setSendError('Bạn đang mất kết nối mạng. Lời chúc vẫn được giữ để gửi lại.'); return; }
     sendingRef.current = true; setSending(true);
     try {
-      await addGuestCommentFireBase(payload);
+      const saved = await addGuestCommentFireBase(payload);
+      invalidateRequests();
+      setLoading(false); setLoadError('');
+      setItems(previous => [saved, ...previous.filter(item => item.id !== saved.id)]);
+      if (!cursor && (loading || loadError)) setHasMore(true);
       setName(''); setMessage(''); setSuggestions(false); setNotice('Đã gửi lời chúc. Cảm ơn tình cảm của bạn!');
-      await fetchPage();
     } catch (error) { setSendError(guestBookError(error)); }
     finally { sendingRef.current = false; setSending(false); }
   };
@@ -93,7 +101,7 @@ export default function GuestBook() {
         {!isFirebaseConfigured && <p className="wish-notice" role="status">Sổ lời chúc chưa được kết nối. Bạn ghé lại sau để gửi lời chúc nhé!</p>}
         <div className="wish-list" aria-label="Các lời chúc" tabIndex="0" aria-busy={loading}>
           {!loading && !loadError && isFirebaseConfigured && !items.length && <p className="wish-notice">Hãy là người đầu tiên gửi lời chúc tới chúng mình!</p>}
-          {items.map(item => <article className="wish-item" key={item.id}><span className="avatar" aria-hidden="true" style={{ backgroundColor: AVATAR_COLORS.includes(item.avatar_color) ? item.avatar_color : AVATAR_COLORS[0] }}>{Array.from(item.guest_name.trim())[0]?.toLocaleUpperCase('vi-VN')}</span><div><h3>{item.guest_name}</h3><time dateTime={item.create_date?.toDate?.().toISOString()}>{formatDate(item.create_date)}</time><p>{item.message}</p></div></article>)}
+          {items.map(item => <WishItem key={item.id} item={item} />)}
         {loading && <p className="wish-notice" role="status">Đang tải lời chúc…</p>}
         {loadError && <div className="wish-notice wish-error" role="alert">{loadError}<button className="wish-more" type="button" disabled={loading} onClick={() => fetchPage(retryCursor.current)}>Thử tải lại</button></div>}
         {hasMore && !loadError && <button className="wish-more" type="button" disabled={loading} onClick={() => fetchPage(cursor)}>Xem thêm</button>}
