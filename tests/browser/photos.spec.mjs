@@ -7,6 +7,8 @@ for (const [width, height] of sizes) {
     await page.setViewportSize({ width, height });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
+    await page.locator('.envelope-seal').click();
+    await expect(page.locator('.envelope-screen')).toHaveCount(0);
     for (const selector of ['.hero-photo', '.person-photo img', '.thanks-photo-wrap img']) {
       for (const photo of await page.locator(selector).all()) {
         await photo.scrollIntoViewIfNeeded();

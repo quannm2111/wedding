@@ -5,6 +5,8 @@ for (const width of [360, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     const errors = []; page.on('pageerror', error => errors.push(error.message));
     await page.goto('/');
+    await page.locator('.envelope-seal').click();
+    await expect(page.locator('.envelope-screen')).toHaveCount(0);
     await expect(page.locator('h1')).toContainText('Quân');
     await expect(page.locator('.hero-photo')).toHaveJSProperty('complete', true);
     await expect(page.locator('.hero-photo')).not.toHaveJSProperty('naturalWidth', 0);
@@ -44,76 +46,88 @@ for (const width of [360, 390, 768, 1440]) {
     await page.screenshot({ path: `test-results/wedding-${width}.png`, fullPage: true });
   });
 }
-test('carousel uses dots and stays on the clicked photo after zoom closes', async ({ page }) => {
-  await page.goto('/');
-  await page.locator('.wedding-carousel').scrollIntoViewIfNeeded();
-  await page.mouse.move(0, 0);
-  const dots = page.locator('.album-dots button');
-  await expect(dots).toHaveCount(10);
-  await expect(dots.first()).not.toHaveAttribute('aria-current', 'true', { timeout: 7000 });
-  await dots.nth(3).click();
-  await expect(dots.nth(3)).toHaveAttribute('aria-current', 'true');
-  await page.locator('.album-slide:not([aria-hidden])').nth(3).click();
-  await expect(page.locator('.fancybox__container')).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(page.locator('.fancybox__container')).toHaveCount(0);
-  await expect(page.locator('.play-toggle, .album-controls')).toHaveCount(0);
-  await expect(dots.nth(3)).toHaveAttribute('aria-current', 'true');
-  await page.evaluate(() => document.activeElement?.blur());
-  await page.mouse.move(0, 0);
-  await page.waitForTimeout(3800);
-  await expect(dots.nth(3)).toHaveAttribute('aria-current', 'true');
-  await dots.nth(8).click();
-  await expect(dots.nth(8)).toHaveAttribute('aria-current', 'true');
-});
 test('reveal waits for viewport and reduced motion reveals all without autoplay', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
+    await page.locator('.envelope-seal').click();
+    await expect(page.locator('.envelope-screen')).toHaveCount(0);
   await expect(page.locator('#TimelineSection .story-item').first()).toHaveCSS('opacity', '0');
+  const offsets = await page.locator('#TimelineSection .story-item').evaluateAll(items => items.map(item => new DOMMatrixReadOnly(getComputedStyle(item).transform).m41));
+  expect(offsets[0]).toBeLessThan(0);
+  expect(offsets[1]).toBeGreaterThan(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect(page.locator('#TimelineSection .story-item').first()).toHaveCSS('opacity', '1');
-  await page.locator('.wedding-carousel').scrollIntoViewIfNeeded();
-  await expect(page.locator('.album-dots button').first()).toHaveAttribute('aria-current', 'true');
+  await expect(page.locator('#TimelineSection .story-item').first()).toHaveCSS('transform', 'none');
+  await page.locator('.photo-gallery').scrollIntoViewIfNeeded();
+  await expect(page.locator('.gallery-thumbnails button').first()).toHaveAttribute('aria-current', 'true');
+  await page.waitForTimeout(1500);
+  await expect(page.locator('.gallery-thumbnails button').first()).toHaveAttribute('aria-current', 'true');
   await expect(page.locator('.hero-hearts')).toHaveCSS('display', 'none');
 });
 
-test('album loops forward from last photo without a reverse scroll', async ({ page }) => {
+
+test('invitation doors open automatically and release page focus', async ({ page }) => {
   await page.goto('/');
-  await page.locator('.wedding-carousel').scrollIntoViewIfNeeded();
-  const dots = page.locator('.album-dots button');
-  await dots.last().click();
-  await expect(dots.last()).toHaveAttribute('aria-current', 'true');
-  await page.waitForTimeout(1000);
-  await dots.last().blur();
-  await page.mouse.move(0, 0);
-  const samples = await page.locator('.album-track').evaluate(async track => {
-    const positions = [];
+  await expect(page.locator('.invitation-page')).toHaveAttribute('inert', '');
+  await expect(page.locator('.envelope-screen')).toHaveCount(0, { timeout: 6000 });
+  await expect(page.locator('.invitation-page')).not.toHaveAttribute('inert');
+  await expect(page.locator('.wedding-hero h1')).toBeFocused();
+  await expect(page.locator('body')).not.toHaveCSS('overflow', 'hidden');
+  await expect(page.locator('.persistent-seal')).toHaveCount(0);
+});
+
+test('seal moves in sync with the left door without moving down', async ({ page }) => {
+  await page.goto('/');
+  const seal = page.locator('.persistent-seal');
+  await expect(seal).toBeFocused();
+  const before = await seal.boundingBox();
+  await page.keyboard.press('Enter');
+  const samples = await page.evaluate(async () => {
+    const door = document.querySelector('.door-left');
+    const seal = document.querySelector('.persistent-seal');
+    const values = [];
     const start = performance.now();
     await new Promise(resolve => {
       const sample = () => {
-        positions.push(new DOMMatrixReadOnly(getComputedStyle(track).transform).m41);
-        if (performance.now() - start < 3100) requestAnimationFrame(sample);
+        const x = node => new DOMMatrixReadOnly(getComputedStyle(node).transform).m41;
+        values.push({ door: x(door), seal: x(seal) });
+        if (performance.now() - start < 1100) requestAnimationFrame(sample);
         else resolve();
       };
       sample();
     });
-    return positions;
+    return values;
   });
-  const changes = samples.slice(1).map((value, i) => value - samples[i]);
-  expect(changes.filter(delta => delta < -1).length).toBeGreaterThan(5);
-  expect(changes.filter(delta => delta > 1000)).toHaveLength(1);
-  expect(changes.filter(delta => delta > 1 && delta <= 1000)).toHaveLength(0);
-  await expect(dots.first()).toHaveAttribute('aria-current', 'true');
-  await page.locator('.wedding-carousel').screenshot({ path: 'test-results/album-desktop.png' });
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.locator('.wedding-carousel').scrollIntoViewIfNeeded();
-  await page.locator('.wedding-carousel').screenshot({ path: 'test-results/album-mobile.png' });
-  const box = await page.locator('.album-viewport').boundingBox();
-  const cdp = await page.context().newCDPSession(page);
-  const y = box.y + 160;
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 280, y }] });
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 130, y }] });
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  await expect(dots.nth(1)).toHaveAttribute('aria-current', 'true');
-  await expect(page.locator('.fancybox__container')).toHaveCount(0);
-  await cdp.detach();
+  expect(samples.at(-1).door).toBeLessThan(-10);
+  expect(Math.max(...samples.map(sample => Math.abs(sample.door - sample.seal)))).toBeLessThan(1);
+  const after = await seal.boundingBox();
+  expect(after.x).toBeLessThan(before.x);
+  expect(after.y).toBeCloseTo(before.y, 0);
+  await expect(page.locator('.envelope-screen')).toHaveCount(0);
+  await expect(seal).toHaveCount(0);
 });
+for (const width of [360, 390, 768, 1440]) {
+ test(`gallery selection, full photos and zoom at ${width}`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 900 });
+  await page.goto('/');
+  await expect(page.locator('.envelope-screen')).toHaveCount(0, { timeout: 6000 });
+  await page.locator('.photo-gallery').scrollIntoViewIfNeeded();
+  await page.mouse.move(0, 0);
+  const thumbs = page.locator('.gallery-thumbnails button');
+  await expect(page.locator('.gallery-current')).toHaveCSS('object-fit', 'contain');
+  await expect(thumbs.nth(1)).toHaveAttribute('aria-current', 'true', { timeout: 8000 });
+  await thumbs.nth(4).click();
+  await expect(thumbs.nth(4)).toHaveAttribute('aria-current', 'true');
+  await expect(page.locator('.gallery-current')).toHaveClass(/is-ready/);
+  await page.locator('.gallery-main').click();
+  await expect(page.locator('.fancybox__container')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.fancybox__container')).toHaveCount(0);
+  await page.locator('.gallery-main').focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(thumbs.nth(5)).toHaveAttribute('aria-current', 'true');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.locator('.photo-gallery').screenshot({ path: `test-results/gallery-${width}.png` });
+ });
+}

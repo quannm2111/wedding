@@ -17,18 +17,22 @@ export const wedding = {
   timeline: [
     {
       title: 'Tình cờ gặp nhau',
+      image: '/wedding/web/ZEN_2614.webp',
       text: 'Ủa, sao lại gặp đúng người này nhỉ?\nMột cuộc gặp tình cờ, một chút duyên số… và thế là hai nhân vật chính của chúng ta xuất hiện!',
     },
     {
       title: 'Lỡ thích nhau rồi!',
+      image: '/wedding/web/ZEN_2088.webp',
       text: 'Ban đầu là “bạn”, sau thành “người thương”.\nChẳng biết từ lúc nào, những cuộc trò chuyện dài hơn, những lần gặp nhau nhiều hơn và trái tim thì… không chịu nghe lời nữa rồi! 😝',
     },
     {
       title: 'Yêu nhau thôi!',
+      image: '/wedding/web/ZEN_2353.webp',
       text: 'Có nhau rồi thì chuyện gì cũng thành chuyện vui.\nCùng ăn, cùng chơi, cùng cười, cùng dỗi… và quan trọng nhất là dỗi xong vẫn phải yêu nhau tiếp! 🤭',
     },
     {
       title: 'Về chung một nhà',
+      image: '/wedding/web/ZEN_2917.webp',
       text: '25.10.2026 – YES, I DO!\nTừ hôm nay, chính thức có thêm một người để yêu thương, sẻ chia và… chọc nhau cả đời!\nMạnh Quân ❤️ Mai Hường\nThe beginning of forever.',
       weddingDay: true,
     },

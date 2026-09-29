@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
+import { AVATAR_COLORS } from '../src/guestbook.js';
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
 import { collection, doc, setDoc, getDocs, query, limit, orderBy, documentId, startAfter, deleteDoc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 
@@ -12,6 +13,12 @@ before(async () => {
   db = env.unauthenticatedContext().firestore();
 });
 after(async () => { await env?.cleanup(); });
+
+test('every avatar color used by the form is accepted by deployed rules', async () => {
+  for (const [index, avatar_color] of AVATAR_COLORS.entries()) {
+    await assertSucceeds(setDoc(doc(db, 'guest_book', `palette-${index}`), { ...valid(), avatar_color }));
+  }
+});
 test('public guests can create and read valid wishes but cannot edit or delete', async () => {
   const ref = doc(db, 'guest_book', 'valid');
   await assertSucceeds(setDoc(ref, valid()));

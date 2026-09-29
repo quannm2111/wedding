@@ -31,7 +31,7 @@ const GuestBookForm = ({ handlePostComment }) => {
       </div>
       <div className="form-actions">
         <button type="submit" className="submit-button">
-          Gửi lời chúc
+          Gửi lời yêu thương
         </button>
       </div>
     </form>

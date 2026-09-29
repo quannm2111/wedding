@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { calendarDays, dateLabel, getCountdown, wedding } from '../wedding';
 import Reveal from './Reveal';
 import WeddingCalendar from './WeddingCalendar';
+import StoryTimeline from './StoryTimeline';
 const WeddingAlbum = lazy(() => import('./wedding_album/WeddingAlbum'));
 function Countdown() {
   const [remaining, setRemaining] = useState(getCountdown);
@@ -11,9 +12,6 @@ function Countdown() {
   }, []);
   if (remaining.done) return <p className="countdown-message">{remaining.isWeddingDay ? 'Hôm nay là ngày vui của chúng mình' : 'Cảm ơn bạn đã cùng chúng mình lưu giữ ngày hạnh phúc'}</p>;
   return <div className="wedding-countdown" aria-label="Đếm ngược tới ngày cưới">{[['days', 'Ngày'], ['hours', 'Giờ'], ['minutes', 'Phút'], ['seconds', 'Giây']].map(([key, label]) => <div key={key}><strong>{String(remaining[key]).padStart(2, '0')}</strong><span>{label}</span></div>)}</div>;
-}
-function Rings() {
-  return <svg className="rings" viewBox="0 0 80 48" aria-hidden="true"><circle cx="29" cy="27" r="17" /><circle cx="51" cy="27" r="17" /><path d="m23 6 6-5 6 5-6 7Z" /></svg>;
 }
 function SectionHeading({ eyebrow, title, children }) {
   return <Reveal className="section-heading"><p className="eyebrow">{eyebrow}</p><h2>{title}</h2><span className="heading-flourish" aria-hidden="true">✧</span>{children}</Reveal>;
@@ -56,8 +54,8 @@ export default function WeddingPage() {
       <div className="person-grid">{[wedding.groom, wedding.bride].map((person, index) => <Reveal key={person.role} delay={index * 140}><article className="person-card"><div className="person-photo"><img src={person.image} alt={person.name} loading="lazy" width="800" height="1000" /></div><div className="person-copy"><p className="eyebrow">{person === wedding.groom ? 'Nhà trai' : 'Nhà gái'}</p><h3>{person.name}</h3><span className="person-divider" aria-hidden="true">♡</span><p>Ông <strong>{person.father}</strong></p><p>Bà <strong>{person.mother}</strong></p></div></article></Reveal>)}</div>
     </section>
     <section className="date-section" id="SaveTheDateSection"><div className="section-wrap"><SectionHeading eyebrow="A day to remember" title="Ngày chung đôi" /><div className="celebration-grid"><Reveal className="date-card"><WeddingCalendar /></Reveal><div className="ceremony-list"><Reveal delay={100}><Ceremony title="Lễ vu quy" event={wedding.vuQuy} /></Reveal><Reveal delay={180}><Ceremony title="Lễ thành hôn" event={wedding} /></Reveal></div></div></div></section>
-    <section className="album-section section-wrap" id="WeddingAlbumSection"><SectionHeading eyebrow="Our moments" title="Khoảnh khắc yêu thương"><p className="section-intro">Một chút ngọt ngào, một chút bình yên. Và thật nhiều yêu thương.</p></SectionHeading><Reveal><Suspense fallback={<p className="album-placeholder">Đang tải album…</p>}><WeddingAlbum /></Suspense></Reveal></section>
-    <section className="story-section section-wrap" id="TimelineSection"><SectionHeading eyebrow="Our love story" title="Hành trình có nhau" /><div className="story-timeline">{wedding.timeline.map((event, index) => <Reveal key={event.title} className="story-item" delay={index % 2 * 100}><article><span className="story-dot" aria-hidden="true">♡</span><span className="story-number" aria-hidden="true">0{index + 1}</span><h3>{event.title}</h3><p className="story-text">{event.text}</p></article></Reveal>)}</div></section>
+    <section className="story-section section-wrap" id="TimelineSection"><SectionHeading eyebrow="Our love story" title="Hành trình có nhau" /><StoryTimeline /></section>
+    <section className="album-section section-wrap" id="WeddingAlbumSection"><SectionHeading eyebrow="Our moments" title="Khoảnh khắc yêu thương"><p className="section-intro">Một chút ngọt ngào, một chút bình yên. Và thật nhiều yêu thương.</p></SectionHeading><Reveal threshold={0.01}><Suspense fallback={<p className="album-placeholder">Đang tải album…</p>}><WeddingAlbum /></Suspense></Reveal></section>
     <section className="thanks-banner" id="ThankYouSection" aria-labelledby="thanks-title">
       <div className="thanks-backdrop" style={{ backgroundImage: `url("${wedding.images.thanks}")` }} aria-hidden="true" />
       <div className="thanks-veil" />

@@ -14,7 +14,7 @@ service cloud.firestore {
         && request.resource.data.message.size() >= 1
         && request.resource.data.message.size() <= 1000
         && request.resource.data.message.matches('[\\s\\S]*[^\\s][\\s\\S]*')
-        && request.resource.data.avatar_color in ['#a64e6b', '#776098', '#497c78', '#996638', '#526e9c']
+        && request.resource.data.avatar_color in ['#e8a0b5', '#f0b7c4', '#d4849c', '#f3c6d0', '#c98aa0', '#a64e6b', '#776098', '#497c78', '#996638', '#526e9c']
         && request.resource.data.create_date == request.time;
       allow update, delete: if false;
     }
