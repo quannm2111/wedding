@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const TARGET = new Date("2026-10-24T10:00:00+07:00");
+const TARGET = new Date("2026-10-24T06:00:00+07:00");
 
 const pad = (value) => String(value).padStart(2, "0");
 

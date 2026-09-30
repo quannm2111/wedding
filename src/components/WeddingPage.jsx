@@ -47,7 +47,7 @@ export default function WeddingPage() {
       <div className="hero-footnote">MỘT NGÀY ĐẶC BIỆT · MỘT ĐỜI CÓ NHAU</div>
     </section>
     <section className="invitation section-wrap" id="InvitationSection">
-      <Reveal className="invitation-card"><span className="ornament" aria-hidden="true">♡</span><p className="eyebrow">Together with our families</p><h2>Trân trọng kính mời</h2><p className="invitation-text">{wedding.invitation}</p><div className="invitation-names"></div><p className="small-caps">ĐẾN CHUNG VUI TRONG NGÀY HẠNH PHÚC</p></Reveal>
+      <Reveal className="invitation-card"><span className="ornament" aria-hidden="true">♡</span><p className="eyebrow">Together with our families</p><h2>Trân trọng kính mời</h2><p className="invitation-text">{wedding.invitation}</p><div className="invitation-names"></div><p className="small-caps"></p></Reveal>
     </section>
     <section className="couple-section section-wrap" id="CoupleImageSection">
       <SectionHeading eyebrow="The bride & groom" title="Chúng mình" />

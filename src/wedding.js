@@ -7,7 +7,7 @@ export const wedding = {
   venue: 'Trung tâm tiệc cưới A15',
   address: 'Số 55 Trần Hòa, Định Công, Hà Nội',
   vuQuy: {
-    startsAt: '2026-10-24T10:00:00+07:00',
+    startsAt: '2026-10-24T06:00:00+07:00',
     address: 'Thôn Phú Xuân, xã Thọ Phú, Thanh Hóa',
   },
   groom: { role: 'Chú rể', name: 'Nguyễn Mạnh Quân', shortName: 'Mạnh Quân', father: 'Nguyễn Mạnh Tiến', mother: 'Nguyễn Thị Tuyết', image: '/wedding/web/ZEN_2171.webp' },
